@@ -1,0 +1,17 @@
+{
+  "name": "wasm-complex-fir-filter-node",
+  "collaborators": [
+    "cho45 <cho45@lowreal.net>"
+  ],
+  "description": "complex-fir-filter-node backend",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "wasm_complex_fir_filter_node_bg.wasm",
+    "wasm_complex_fir_filter_node.js",
+    "wasm_complex_fir_filter_node.d.ts"
+  ],
+  "module": "wasm_complex_fir_filter_node.js",
+  "types": "wasm_complex_fir_filter_node.d.ts",
+  "sideEffects": "false"
+}
