@@ -66,13 +66,17 @@ export class ComplexFirFilterKernel {
     * @param {Float32Array} output_
     */
     process(input_, output_) {
-        const ptr0 = passArrayF32ToWasm(output_);
+        const ptr0 = passArrayF32ToWasm(input_);
         const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArrayF32ToWasm(output_);
+        const len1 = WASM_VECTOR_LEN;
         try {
-            wasm.complexfirfilterkernel_process(this.ptr, passArrayF32ToWasm(input_), WASM_VECTOR_LEN, ptr0, len0);
+            wasm.complexfirfilterkernel_process(this.ptr, ptr0, len0, ptr1, len1);
         } finally {
-            output_.set(getFloat32Memory().subarray(ptr0 / 4, ptr0 / 4 + len0));
+            input_.set(getFloat32Memory().subarray(ptr0 / 4, ptr0 / 4 + len0));
             wasm.__wbindgen_free(ptr0, len0 * 4);
+            output_.set(getFloat32Memory().subarray(ptr1 / 4, ptr1 / 4 + len1));
+            wasm.__wbindgen_free(ptr1, len1 * 4);
         }
     }
 }

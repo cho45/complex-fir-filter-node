@@ -69,8 +69,8 @@ impl ComplexFirFilterKernel {
         sum
     }
 
-    pub fn process(&mut self, input_: &[f32], output_: &mut [f32]) {
-        let input:  &[Complex<f32>] = unsafe { slice::from_raw_parts(input_  as *const [f32] as *const Complex<f32>, input_.len() / 2 )};
+    pub fn process(&mut self, input_: &mut [f32], output_: &mut [f32]) {
+        let input:  &mut [Complex<f32>] = unsafe { slice::from_raw_parts_mut(input_  as *mut [f32] as *mut Complex<f32>, input_.len() / 2 )};
         let output:  &mut [Complex<f32>] = unsafe { slice::from_raw_parts_mut(output_  as *mut [f32] as *mut Complex<f32>, output_.len() / 2 )};
 
         for i in 0..input.len() {

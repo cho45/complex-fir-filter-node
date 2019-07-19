@@ -99,22 +99,35 @@ export class ComplexFirFilterNode extends AudioWorkletNode {
 					const output = outputs[0];
 					const length = input[0].length;
 
-					const in_ = this.typedMalloc(Float32Array, length * 2);
+					if (!this.in_) {
+						this.in_ = this.typedMalloc(Float32Array, length * 2);
+					} else {
+						if (this.in_.len !== length * 2) {
+							this.in_.free();
+							this.in_ = this.typedMalloc(Float32Array, length * 2);
+						}
+					}
+
+					if (!this.out) {
+						this.out = this.typedMalloc(Float32Array, length * 2);
+					} else {
+						if (this.out.len !== length * 2) {
+							this.out.free();
+							this.out = this.typedMalloc(Float32Array, length * 2);
+						}
+					}
+
+					const in_ = this.in_;
 					for (let i = 0, ina = in_.array; i < length; i++) {
 						ina[i*2+0] = input[0][i];
 						ina[i*2+1] = input[1][i];
 					}
 
-					const out = this.typedMalloc(Float32Array, length * 2);
-					try {
-						this.wasm.complexfirfilterkernel_process(this.kernelPtr, in_.ptr, in_.len, out.ptr, out.len);
-						for (let i = 0, oua = out.array; i < length; i++) {
-							output[0][i] = oua[i*2+0];
-							output[1][i] = oua[i*2+1];
-						}
-					} finally {
-						// in_.free();
-						out.free();
+					const out = this.out;
+					this.wasm.complexfirfilterkernel_process(this.kernelPtr, in_.ptr, in_.len, out.ptr, out.len);
+					for (let i = 0, oua = out.array; i < length; i++) {
+						output[0][i] = oua[i*2+0];
+						output[1][i] = oua[i*2+1];
 					}
 
 					return true;
