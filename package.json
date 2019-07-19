@@ -1,5 +1,5 @@
 {
-  "name": "wasm-complex-fir-filter-node",
+  "name": "complex-fir-filter-node",
   "version": "1.0.0",
   "description": "",
   "main": "complex-fir-filter-node.js",
