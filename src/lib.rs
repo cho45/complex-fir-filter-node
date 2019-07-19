@@ -7,6 +7,7 @@ use std::slice;
 use std::f32;
 use std::collections::VecDeque;
 use num_complex::Complex;
+use num_traits::Zero;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -33,7 +34,7 @@ impl ComplexFirFilterKernel {
     #[allow(clippy::new_without_default)]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        let coeffs = vec![Complex::new(0.0, 0.0); 0].into_boxed_slice();
+        let coeffs = vec![Complex::zero(); 0].into_boxed_slice();
         let hist = VecDeque::with_capacity(0);
         Self {
             coeffs,
@@ -44,8 +45,8 @@ impl ComplexFirFilterKernel {
     pub fn set_coeffs(&mut self, coeffs_: &[f32]) {
         let n = coeffs_.len() / 2;
         let coeffs = unsafe { slice::from_raw_parts_mut(coeffs_  as *const [f32] as *mut Complex<f32>, n ) };
-        self.coeffs = vec![Complex::new(0.0, 0.0); n].into_boxed_slice();
-        self.hist.resize(n, Complex::new(0.0, 0.0));
+        self.coeffs = vec![Complex::zero(); n].into_boxed_slice();
+        self.hist.resize(n, Complex::zero());
         self.coeffs.copy_from_slice(coeffs);
         console_log!("set_coeffs {}, {}", n, self.coeffs.len());
     }
@@ -60,7 +61,7 @@ impl ComplexFirFilterKernel {
         self.hist.pop_back();
         self.hist.push_front(num);
 
-        let mut sum : Complex<f32> = Complex::new(0.0, 0.0);
+        let mut sum : Complex<f32> = Complex::zero();
         for i in 0..n {
             sum += self.coeffs[i] * self.hist[i];
         }
