@@ -6,6 +6,7 @@ extern crate num_complex;
 use std::slice;
 use std::f32;
 use std::ptr;
+use std::collections::VecDeque;
 use num_complex::Complex;
 use wasm_bindgen::prelude::*;
 
@@ -25,7 +26,7 @@ macro_rules! console_log {
 #[wasm_bindgen]
 pub struct ComplexFirFilterKernel {
     coeffs: Box<[Complex<f32>]>,
-    hist: Box<[Complex<f32>]>,
+    hist: VecDeque<Complex<f32>>,
 }
 
 #[wasm_bindgen]
@@ -34,7 +35,7 @@ impl ComplexFirFilterKernel {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         let coeffs = vec![Complex::new(0.0, 0.0); 0].into_boxed_slice();
-        let hist = vec![Complex::new(0.0, 0.0); 0].into_boxed_slice();
+        let hist = VecDeque::with_capacity(0);
         Self {
             coeffs,
             hist
@@ -45,7 +46,7 @@ impl ComplexFirFilterKernel {
         let n = coeffs_.len() / 2;
         let coeffs = unsafe { slice::from_raw_parts_mut(coeffs_  as *const [f32] as *mut Complex<f32>, n ) };
         self.coeffs = vec![Complex::new(0.0, 0.0); n].into_boxed_slice();
-        self.hist = vec![Complex::new(0.0, 0.0); n].into_boxed_slice();
+        self.hist.resize(n, Complex::new(0.0, 0.0));
         self.coeffs.copy_from_slice(coeffs);
         console_log!("set_coeffs {}, {}", n, self.coeffs.len());
     }
@@ -57,14 +58,8 @@ impl ComplexFirFilterKernel {
             return num;
         }
 
-        unsafe {
-            ptr::copy(
-                self.hist.get_unchecked(0),
-                self.hist.get_unchecked_mut(1),
-                self.hist.len() - 1
-            );
-        }
-        self.hist[0] = num;
+        self.hist.pop_back();
+        self.hist.push_front(num);
 
         let mut sum : Complex<f32> = Complex::new(0.0, 0.0);
         for i in 0..n {
