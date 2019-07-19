@@ -5,7 +5,6 @@ extern crate num_complex;
 //use std::mem;
 use std::slice;
 use std::f32;
-use std::ptr;
 use std::collections::VecDeque;
 use num_complex::Complex;
 use wasm_bindgen::prelude::*;
